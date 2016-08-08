@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <iostream>
+#include <map>
+#include <sstream>
 
 #include "Object_management.h"
 #include "CompareToPolygon.hpp"
@@ -33,6 +35,10 @@ private slots:
     void on_btn_input_filename_answer_clicked();
     void on_btn_input_filename_test_clicked();
     void on_btn_start_marking_exam_clicked();
+
+private:
+    void detect_typename(std::string *typename_evaluation_strName, int typename_evaluation_size);
+    void typename_evaluation(std::string *typename_evaluation_strName, int **typename_evaluation_count, int typename_evaluation_size, std::string **test_check_mapping_table);
 
 private:
     Ui::MainWindow *ui;

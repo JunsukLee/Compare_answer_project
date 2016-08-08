@@ -23,9 +23,15 @@ void MainWindow::init()
     ui->progressBar->setValue(0);
     ui->progressBar->setStyleSheet(ui->progressBar->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: green; }");
     ui->progressBar->setTextVisible(true);
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
-    ui->tableWidget->setColumnWidth(0, 50);
+
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    //ui->tableWidget->setRowCount(10);
+    ui->tableWidget->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignCenter);
+
+    //ui->tableWidget->item(1,1)->setTextAlignment(Qt::AlignCenter, Qt::TextAlignmentRole);
+
+
 }
 
 void MainWindow::on_Btn_answer_folderUrl_clicked()
@@ -102,8 +108,27 @@ void MainWindow::on_btn_start_marking_exam_clicked()
         int total_object = 0;
         int total_true_positive_object = 0;
         int total_false_positive_object = 0;
+        int total_false_negative_object = 0;
+        double total_accuracy = 0;
         double total_precision = 0;
         double total_false_discovery_rate = 0;
+
+
+        const int typename_evaluation_size = 10;
+        std::string *typename_evaluation_strName = new std::string[typename_evaluation_size];
+        int **typename_evaluation_count;
+        typename_evaluation_count= new int*[typename_evaluation_size];
+
+        for(int i =0; i < typename_evaluation_size ; i++){
+            typename_evaluation_strName[i] = "";
+            typename_evaluation_count[i] = new int[3];
+            memset(typename_evaluation_count[i], 0, 3 * sizeof(int));
+        }
+
+
+        current_filenNumber = 0;
+        answer_file_totalCount = scanFileList(answer_folder_url.toString(), answer_main_Filename);
+        test_file_totalCount = scanFileList(test_folder_url.toString(), test_main_Filename);
 
 
         while(current_filenNumber < answer_file_totalCount){
@@ -116,37 +141,53 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             this->test_object_data->setObject_path(test_folder_url.toString(), QString(test_main_Filename).append(QString::number(current_filenNumber)).append(QString(".xml")));
             this->test_object_data->readXMLDataset();
 
+            std::cout << "-------------------------------------------------------" << std::endl;
             std::cout << "filename : " << QString(answer_main_Filename).append(QString::number(current_filenNumber)).append(QString(".xml")).toUtf8().constData() << std::endl;
+            std::cout << "-------------------------------------------------------" << std::endl;
 
+            //initalize mapping_table
             bool *answer_check_mapping_table = new bool[answer_object_data->getCount()];
-            bool *test_check_mapping_table   = new bool[test_object_data->getCount()];
-            memset(answer_check_mapping_table, false, answer_object_data->getCount() * sizeof(bool));
-            memset(test_check_mapping_table, false, test_object_data->getCount() * sizeof(bool));
+            std::string **test_check_mapping_table   = new std::string*[test_object_data->getCount()];
 
+            memset(answer_check_mapping_table, false, answer_object_data->getCount() * sizeof(bool));
+            for(int i=0; i<test_object_data->getCount(); i++){
+                test_check_mapping_table[i] = new std::string[3];
+                test_check_mapping_table[i][0] = "";
+                test_check_mapping_table[i][1] = "";
+                test_check_mapping_table[i][2] = "0";
+            }            
+            //initalize mapping_table_END
+
+            //initalize index
             int answer_index = 0;
             int test_index = 0;
+            //initalize index_END
+
+            //Detection typename
+            MainWindow::detect_typename(typename_evaluation_strName, typename_evaluation_size);
+            for(int i =0 ; i < typename_evaluation_size ; i++){
+                if(typename_evaluation_strName[i].compare("") == 0){
+                    break;
+                }
+                std::cout << i << ") typename : " << typename_evaluation_strName[i] << std::endl;
+            }
+            //Detection typename_END
 
 
 
             while(answer_index < answer_object_data->getCount()){
 
-                int best_source[2] = {-1, -1}; // {index, source}
+                int best_score[2] = {-1, -1}; // {index, score}
 
                 while(test_index < test_object_data->getCount()){
 
-                    if(!answer_object_data->getType_name(answer_index).compare(test_object_data->getType_name(test_index)) && !test_check_mapping_table[test_index]){
-                        compareToPolygon->init();
-
+                    //compare to overlap
+                    if(!test_check_mapping_table[test_index][2].compare("0")){
                         answer_shape_type    = answer_object_data->getShape_config(answer_index)->getShape_type();
                         answer_shape_centerX = answer_object_data->getShape_config(answer_index)->getCenter_point_x();
                         answer_shape_centerY = answer_object_data->getShape_config(answer_index)->getCenter_point_y();
                         answer_shape_lengthX = answer_object_data->getShape_config(answer_index)->getLength_x();
                         answer_shape_lengthY = answer_object_data->getShape_config(answer_index)->getLength_y();
-
-                        printf("[%d][%d]----- : %s   %s\n", answer_index, test_index, answer_object_data->getType_name(answer_index).c_str(), test_object_data->getType_name(test_index).c_str());
-
-                        printf("----- : %d   %d   %d   %d   %d\n", answer_shape_type, answer_shape_centerX, answer_shape_centerY, answer_shape_lengthX, answer_shape_lengthY);
-
                         compareToPolygon->setPolygonData(true, answer_shape_type, answer_shape_centerX, answer_shape_centerY, answer_shape_lengthX, answer_shape_lengthY);
 
                         test_shape_type    = test_object_data->getShape_config(test_index)->getShape_type();
@@ -154,36 +195,71 @@ void MainWindow::on_btn_start_marking_exam_clicked()
                         test_shape_centerY = test_object_data->getShape_config(test_index)->getCenter_point_y();
                         test_shape_lengthX = test_object_data->getShape_config(test_index)->getLength_x();
                         test_shape_lengthY = test_object_data->getShape_config(test_index)->getLength_y();
-
                         compareToPolygon->setPolygonData(false, test_shape_type, test_shape_centerX, test_shape_centerY, test_shape_lengthX, test_shape_lengthY);
 
-                        qDebug() << "answer_index : " << answer_index;
-                        qDebug() << "test_index : " << test_index;
+                        double score = compareToPolygon->OverlapArea();
+                        std::cout << "[test_index::"<< test_index <<"]Score : " << score << std::endl;                        
 
-                        double source = compareToPolygon->OverlapArea();
-                        std::cout << "Source : " << source << std::endl;
-                        if(source > 0.8){
-                            if(best_source[1] < source){
-                                best_source[0] = test_index;
-                                best_source[1] = source;
+                        if(score >= 0.8){ // Positive
+                            // answer_Object_type_name == test_Object_type_name
+                            if(!answer_object_data->getType_name(answer_index).compare(test_object_data->getType_name(test_index))){
+                                test_check_mapping_table[test_index][0] = answer_object_data->getType_name(answer_index);
+                                test_check_mapping_table[test_index][1] = "FP";
+                                if(best_score[1] < score){
+                                    best_score[0] = test_index;
+                                    best_score[1] = score;
+                                }
+                            }else{ // answer_Object_type_name != test_Object_type_name
+                                test_check_mapping_table[test_index][0] = answer_object_data->getType_name(answer_index);
+                                test_check_mapping_table[test_index][1] = "FP";
+                            }
+                        }else{ // Negative
+                            if(test_check_mapping_table[test_index][1].compare("FP") != 0){
+                                test_check_mapping_table[test_index][0] = "";
+                                test_check_mapping_table[test_index][1] = "FN";
                             }
                         }
-
-                    }else{
-                        answer_check_mapping_table[answer_index] = false;
-
                     }
                     test_index++;
+                    compareToPolygon->init();
                 }
 
-                if(best_source[1] > 0.8){
+                if(best_score[1] >= 0.8){
                     answer_check_mapping_table[answer_index] = true;
-                    test_check_mapping_table[best_source[0]] = true;
+                    test_check_mapping_table[best_score[0]][1] = "TP";
+                    test_check_mapping_table[best_score[0]][2] = "1";
                 }
-                std::cout << best_source[0] << ", " << best_source[1] << std::endl;
+
+                std::cout << best_score[0] << ", " << best_score[1] << std::endl;
                 answer_index++;
                 test_index = 0;
+
             }
+
+
+            std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++0" << std::endl;
+            for(int j=0; j < test_object_data->getCount() ; j++){
+                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][0] <<std::endl;
+                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][1] <<std::endl;
+                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][2] <<std::endl;
+
+                if(test_check_mapping_table[j][1].compare("TP") == 0){
+                    total_true_positive_object++;
+                }else if(test_check_mapping_table[j][1].compare("FP") == 0){
+                    total_false_positive_object++;
+                }else if(test_check_mapping_table[j][1].compare("FN") == 0){
+                    total_false_negative_object++;
+                }
+            }
+
+            total_object += test_object_data->getCount();
+
+            MainWindow::typename_evaluation(typename_evaluation_strName, typename_evaluation_count, typename_evaluation_size, test_check_mapping_table);
+
+
+
+            std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++00" << std::endl;
+
 
             this->answer_object_data->init();
             this->test_object_data->init();
@@ -191,5 +267,95 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             ui->progressBar->setValue((current_filenNumber / answer_file_totalCount)*100);
             //ui->progressBar->setFormat(QString::number((current_filenNumber / answer_file_totalCount)*100).append("%"));
         }
+
+        if((total_true_positive_object + total_false_positive_object) == 0)
+            total_precision = 0;
+        else
+            total_precision = ((double)total_true_positive_object / ((double)total_true_positive_object + (double)total_false_positive_object));
+        total_accuracy = ((double)total_true_positive_object / ((double)total_true_positive_object + (double)total_false_positive_object) + (double)total_false_negative_object);
+        total_false_discovery_rate = 1 - total_precision;
+
+        std::cout << "Total Precision : " << total_precision << std::endl;
+        std::cout << "Total FDR : " << total_false_discovery_rate << std::endl;
+
+
+        ui->tableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(answer_file_totalCount)));
+        ui->tableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(current_filenNumber)));
+        ui->tableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(total_accuracy)));
+        ui->tableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(total_precision)));
+        ui->tableWidget->setItem(4, 0, new QTableWidgetItem(QString::number(total_false_discovery_rate)));
+        ui->tableWidget->insertRow(5);
+        ui->tableWidget->setVerticalHeaderItem(5, new QTableWidgetItem(""));
+
+
+        int addrow=0;
+        for(const int i=3; addrow<typename_evaluation_size ; addrow++){
+            if(typename_evaluation_strName[addrow].compare("") == 0){
+                break;
+            }
+            int TP = typename_evaluation_count[addrow][0];
+            int FP = typename_evaluation_count[addrow][1];
+            int TN = 0;
+            int FN = typename_evaluation_count[addrow][2];
+            double accuracy = 0.0;
+            double precision = 0.0;
+
+            if((TP + TN + FP + FN) != 0)
+                accuracy = ((double)TP + (double)TN) / ((double)TP + (double)TN + (double)FP + (double)FN);
+            if((TP+FP) != 0)
+                precision = ((double)TP) / ((double)TP + (double)FP);
+
+            ui->tableWidget->insertRow(6+addrow*i+0);
+            ui->tableWidget->insertRow(6+addrow*i+1);
+            ui->tableWidget->insertRow(6+addrow*i+2);
+
+            ui->tableWidget->setVerticalHeaderItem(6+addrow*i+0, new QTableWidgetItem(QString::fromStdString(typename_evaluation_strName[addrow]).append(QString(" accuracy"))));
+            ui->tableWidget->setItem(6+addrow*i+0, 0, new QTableWidgetItem(QString::number(accuracy)));
+
+            ui->tableWidget->setVerticalHeaderItem(6+addrow*i+1, new QTableWidgetItem(QString::fromStdString(typename_evaluation_strName[addrow]).append(QString(" precision"))));
+            ui->tableWidget->setItem(6+addrow*i+1, 0, new QTableWidgetItem(QString::number(precision)));
+
+            ui->tableWidget->setVerticalHeaderItem(6+addrow*i+2, new QTableWidgetItem(""));
+
+
+        }
+    }
+}
+
+void MainWindow::detect_typename(std::string *typename_evaluation_strName, int typename_evaluation_size)
+{
+    for(int i=0; i < this->test_object_data->getCount(); i++){
+        for(int j=0; j < typename_evaluation_size; j++){
+            if(typename_evaluation_strName[j].compare(this->test_object_data->getType_name(i)) == 0){
+                break;
+            }
+            if(typename_evaluation_strName[j].compare("") == 0){
+                typename_evaluation_strName[j] = this->test_object_data->getType_name(i);
+                break;
+            }
+        }
+    }
+}
+
+void MainWindow::typename_evaluation(std::string *typename_evaluation_strName, int **typename_evaluation_count, int typename_evaluation_size, std::string **test_check_mapping_table)
+{
+    int test_index = 0;
+    while(test_index < this->test_object_data->getCount()){
+        for(int i = 0; i < typename_evaluation_size ; i++){
+            if(typename_evaluation_strName[i].compare("") == 0){
+                break;
+            }
+
+            if(this->test_object_data->getType_name(test_index).compare(typename_evaluation_strName[i]) == 0){
+                if(test_check_mapping_table[i][1].compare("TP") == 0){
+                    typename_evaluation_count[i][0]++;
+                }else if(test_check_mapping_table[i][1].compare("FP") == 0){
+                    typename_evaluation_count[i][1]++;
+                }else if(test_check_mapping_table[i][1].compare("FN") == 0){
+                    typename_evaluation_count[i][2]++;
+                }
+            }
+        }
+        test_index++;
     }
 }

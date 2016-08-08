@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>808</width>
-    <height>748</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -356,8 +356,8 @@
      <rect>
       <x>30</x>
       <y>400</y>
-      <width>720</width>
-      <height>271</height>
+      <width>721</width>
+      <height>351</height>
      </rect>
     </property>
     <property name="sortingEnabled">
@@ -368,32 +368,42 @@
     </property>
     <row>
      <property name="text">
-      <string>New Row</string>
-     </property>
-    </row>
-    <row>
-     <property name="text">
       <string>Total target files</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
      </property>
     </row>
     <row>
      <property name="text">
       <string>Total successful files</string>
      </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Total accuracy</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
     </row>
     <row>
      <property name="text">
       <string>Total precision(PPV)</string>
      </property>
-    </row>
-    <row>
-     <property name="text">
-      <string>Total positive object</string>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
      </property>
     </row>
     <row>
      <property name="text">
-      <string>Total true answer object</string>
+      <string>Total false_discovery_rate(FDR)</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
      </property>
     </row>
     <column>
