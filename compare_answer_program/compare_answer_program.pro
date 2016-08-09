@@ -17,12 +17,15 @@ SOURCES += main.cpp\
     Shape_configuration.cpp \
     Object_management.cpp \
     clipper.cpp \
-    CompareToPolygon.cpp
+    CompareToPolygon.cpp \
+    Evaluation.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     Shape_configuration.h \
     Object_management.h \
     clipper.hpp \
-    CompareToPolygon.hpp
+    CompareToPolygon.hpp \
+    mainwindow.h \
+    Evaluation.hpp
 
 FORMS    += mainwindow.ui

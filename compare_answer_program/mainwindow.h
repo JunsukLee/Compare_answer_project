@@ -39,6 +39,7 @@ private slots:
 private:
     void detect_typename(std::string *typename_evaluation_strName, int typename_evaluation_size);
     void typename_evaluation(std::string *typename_evaluation_strName, int **typename_evaluation_count, int typename_evaluation_size, std::string **test_check_mapping_table);
+    QString makefilename(int num);
 
 private:
     Ui::MainWindow *ui;
@@ -57,6 +58,8 @@ private:
     QString test_main_Filename;
     int test_file_totalCount;
     Object_management *test_object_data;
+
+    const double PERCENTILE = 100.0;
 };
 
 #endif // MAINWINDOW_H

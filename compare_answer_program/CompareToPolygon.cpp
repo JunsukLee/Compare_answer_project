@@ -54,8 +54,7 @@ double CompareToPolygon::OverlapArea()
         intersection_area += fabs(ClipperLib::Area(intersection.at(i)));
     }
 
-    if(intersection.size() > 0 && answer_polygon_area !=0 && test_polygon_area != 0){
-        // intersection_area / MAX(answer_polygon_area, test_polygon_area)
+    if(intersection.size() > 0 && answer_polygon_area !=0 && test_polygon_area != 0){        
         double score = intersection_area / ( answer_polygon_area > test_polygon_area ? answer_polygon_area : test_polygon_area );
         return score;
     }
@@ -69,7 +68,7 @@ void CompareToPolygon::convertPolygon_OF_clipperForm(bool type, int shape_type, 
 
     if(shape_type == 1) // circle
     {
-        temp_polygon = CompareToPolygon::circle2polygon(center_point_x, center_point_y, length_x/2, 1);
+        temp_polygon = CompareToPolygon::circle2polygon(center_point_x, center_point_y, length_x/2, PARTITION_ANGLE);
     }else if(shape_type == 2) // rectangle
     {
         temp_polygon =CompareToPolygon::rect2polygon(center_point_x, center_point_y, length_x, length_y);
@@ -93,7 +92,6 @@ ClipperLib::Path CompareToPolygon::circle2polygon(const int center_x, const int 
         x_coordinate = (center_x + (r * cos(radian*(PI/180)))) * ZOOMIN;
         y_coordinate = (center_y + (r * sin(radian*(PI/180)))) * ZOOMIN;
 
-        //std::cout << "x_coordinate : "  << x_coordinate << "   y_coordinate : "<< y_coordinate << std::endl;
         circle_polygon.push_back(ClipperLib::IntPoint((int)x_coordinate, (int)y_coordinate));
     }
 

@@ -24,7 +24,8 @@ private:
     ClipperLib::Path rect2polygon(const int center_x, const int center_y, int length_x, int length_y);
 
 private:
-    const int ZOOMIN = 1000;
+    const int PARTITION_ANGLE = 1;
+    const int ZOOMIN = 1000;    
     const double PI  = 3.141592;
 
 private:

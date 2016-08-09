@@ -8,9 +8,6 @@ void Object_management::setObject_path(QString foldername, QString filename)
 {
     Object_management::setFoldername(foldername);
     Object_management::setFilename(filename);
-
-    //printf("foldername : %s\n", foldername.toUtf8().constData());
-    //printf("filename   : %s\n", filename.toUtf8().constData());
 }
 
 void Object_management::setObject_Config(int count)

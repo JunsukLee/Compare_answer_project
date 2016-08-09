@@ -126,7 +126,7 @@ void MainWindow::on_btn_start_marking_exam_clicked()
         }
 
 
-        current_filenNumber = 0;
+        current_filenNumber = 1;
         answer_file_totalCount = scanFileList(answer_folder_url.toString(), answer_main_Filename);
         test_file_totalCount = scanFileList(test_folder_url.toString(), test_main_Filename);
 
@@ -134,16 +134,12 @@ void MainWindow::on_btn_start_marking_exam_clicked()
         while(current_filenNumber < answer_file_totalCount){
             // Start
             this->answer_object_data = new Object_management();
-            this->answer_object_data->setObject_path(answer_folder_url.toString(), QString(answer_main_Filename).append(QString::number(current_filenNumber)).append(QString(".xml")));
+            this->answer_object_data->setObject_path(answer_folder_url.toString(), QString(answer_main_Filename).append(MainWindow::makefilename(current_filenNumber)).append(QString(".xml")));
             this->answer_object_data->readXMLDataset();
 
             this->test_object_data = new Object_management();
-            this->test_object_data->setObject_path(test_folder_url.toString(), QString(test_main_Filename).append(QString::number(current_filenNumber)).append(QString(".xml")));
-            this->test_object_data->readXMLDataset();
-
-            std::cout << "-------------------------------------------------------" << std::endl;
-            std::cout << "filename : " << QString(answer_main_Filename).append(QString::number(current_filenNumber)).append(QString(".xml")).toUtf8().constData() << std::endl;
-            std::cout << "-------------------------------------------------------" << std::endl;
+            this->test_object_data->setObject_path(test_folder_url.toString(), QString(test_main_Filename).append(MainWindow::makefilename(current_filenNumber)).append(QString(".xml")));
+            this->test_object_data->readXMLDataset();            
 
             //initalize mapping_table
             bool *answer_check_mapping_table = new bool[answer_object_data->getCount()];
@@ -152,11 +148,26 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             memset(answer_check_mapping_table, false, answer_object_data->getCount() * sizeof(bool));
             for(int i=0; i<test_object_data->getCount(); i++){
                 test_check_mapping_table[i] = new std::string[3];
-                test_check_mapping_table[i][0] = "";
-                test_check_mapping_table[i][1] = "";
+                test_check_mapping_table[i][0] = ""; //
+                test_check_mapping_table[i][1] = ""; //TP
                 test_check_mapping_table[i][2] = "0";
             }            
             //initalize mapping_table_END
+
+//            std::vector<bool> answer(answer_object_data->getCount());
+//            std::array<bool, answer_object_data->getCount()> answer;
+//            std::array<std::array<std::string, 3>, test_object_data->getCount()) tcmt;
+//            std::map<std::pair<std::string, int>, object> object_map;
+//            typedef std::pair<std::string, int> object_id;
+//            object a_object(cent, centy, legth,);
+//            object[object_id("red_light", 3)] = object(cent, centy, cent,x) ;//a_object;
+//            for(std::map<object_id, object>::iterator it = object.begin(); it != object.end(); ++it)
+//            {
+//                it->first->first;
+//            }
+
+
+
 
             //initalize index
             int answer_index = 0;
@@ -236,12 +247,7 @@ void MainWindow::on_btn_start_marking_exam_clicked()
 
             }
 
-
-            std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++0" << std::endl;
-            for(int j=0; j < test_object_data->getCount() ; j++){
-                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][0] <<std::endl;
-                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][1] <<std::endl;
-                std::cout << "test[" << j <<"] : " << test_check_mapping_table[j][2] <<std::endl;
+            for(int j=0; j < test_object_data->getCount() ; j++){                
 
                 if(test_check_mapping_table[j][1].compare("TP") == 0){
                     total_true_positive_object++;
@@ -256,11 +262,6 @@ void MainWindow::on_btn_start_marking_exam_clicked()
 
             MainWindow::typename_evaluation(typename_evaluation_strName, typename_evaluation_count, typename_evaluation_size, test_check_mapping_table);
 
-
-
-            std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++00" << std::endl;
-
-
             this->answer_object_data->init();
             this->test_object_data->init();
             current_filenNumber++;
@@ -272,7 +273,7 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             total_precision = 0;
         else
             total_precision = ((double)total_true_positive_object / ((double)total_true_positive_object + (double)total_false_positive_object));
-        total_accuracy = ((double)total_true_positive_object / ((double)total_true_positive_object + (double)total_false_positive_object) + (double)total_false_negative_object);
+        total_accuracy = ((double)total_true_positive_object / ((double)total_true_positive_object + (double)total_false_positive_object + (double)total_false_negative_object));
         total_false_discovery_rate = 1 - total_precision;
 
         std::cout << "Total Precision : " << total_precision << std::endl;
@@ -281,9 +282,16 @@ void MainWindow::on_btn_start_marking_exam_clicked()
 
         ui->tableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(answer_file_totalCount)));
         ui->tableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(current_filenNumber)));
-        ui->tableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(total_accuracy)));
-        ui->tableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(total_precision)));
-        ui->tableWidget->setItem(4, 0, new QTableWidgetItem(QString::number(total_false_discovery_rate)));
+        ui->tableWidget->setItem(2, 0, new QTableWidgetItem(QString::number(total_accuracy*PERCENTILE)));
+        ui->tableWidget->setItem(3, 0, new QTableWidgetItem(QString::number(total_precision*PERCENTILE)));
+        ui->tableWidget->setItem(4, 0, new QTableWidgetItem(QString::number(total_false_discovery_rate*PERCENTILE)));
+
+        ui->tableWidget->item(0,0)->setTextAlignment(Qt::AlignCenter);
+        ui->tableWidget->item(1,0)->setTextAlignment(Qt::AlignCenter);
+        ui->tableWidget->item(2,0)->setTextAlignment(Qt::AlignCenter);
+        ui->tableWidget->item(3,0)->setTextAlignment(Qt::AlignCenter);
+        ui->tableWidget->item(4,0)->setTextAlignment(Qt::AlignCenter);
+
         ui->tableWidget->insertRow(5);
         ui->tableWidget->setVerticalHeaderItem(5, new QTableWidgetItem(""));
 
@@ -310,15 +318,16 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             ui->tableWidget->insertRow(6+addrow*i+2);
 
             ui->tableWidget->setVerticalHeaderItem(6+addrow*i+0, new QTableWidgetItem(QString::fromStdString(typename_evaluation_strName[addrow]).append(QString(" accuracy"))));
-            ui->tableWidget->setItem(6+addrow*i+0, 0, new QTableWidgetItem(QString::number(accuracy)));
+            ui->tableWidget->setItem(6+addrow*i+0, 0, new QTableWidgetItem(QString::number(accuracy*PERCENTILE)));
+            ui->tableWidget->item(6+addrow*i+0,0)->setTextAlignment(Qt::AlignCenter);
 
             ui->tableWidget->setVerticalHeaderItem(6+addrow*i+1, new QTableWidgetItem(QString::fromStdString(typename_evaluation_strName[addrow]).append(QString(" precision"))));
-            ui->tableWidget->setItem(6+addrow*i+1, 0, new QTableWidgetItem(QString::number(precision)));
+            ui->tableWidget->setItem(6+addrow*i+1, 0, new QTableWidgetItem(QString::number(precision*PERCENTILE)));
+            ui->tableWidget->item(6+addrow*i+1,0)->setTextAlignment(Qt::AlignCenter);
 
             ui->tableWidget->setVerticalHeaderItem(6+addrow*i+2, new QTableWidgetItem(""));
-
-
         }
+
     }
 }
 
@@ -358,4 +367,15 @@ void MainWindow::typename_evaluation(std::string *typename_evaluation_strName, i
         }
         test_index++;
     }
+}
+
+QString MainWindow::makefilename(int num){
+    int n1 = num / 1000; num -= (n1*1000);
+    int n2 = num / 100;  num -= (n2*100);
+    int n3 = num / 10;   num -= (n3*10);
+    int n4 = num;
+
+    QString result = QString::number(n1).append(QString::number(n2)).append(QString::number(n3)).append(QString::number(n4));
+
+    return result;
 }
