@@ -78,4 +78,5 @@ int  Shape_configuation::string2int_shapeType(std::string shape_type)
         return 1;
     if(!shape_type.compare("rectangle"))
         return 2;
+    return -1;
 }

@@ -2,8 +2,6 @@
 
 void CompareToPolygon::setPolygonData(bool type, int shape_type, int center_point_x, int center_point_y, int length_x, int length_y)
 {
-    //printf("IN setPolygonData(%d) :: shape_type : %d \n",type, shape_type);
-
     if(shape_type == 0 || shape_type == 1 || shape_type == 2){
         if(type){
             Answer_shape_type = shape_type;
@@ -50,7 +48,7 @@ double CompareToPolygon::OverlapArea()
     double test_polygon_area = fabs(ClipperLib::Area(Test_polygon));;
     double intersection_area = 0;
 
-    for(int i = 0; i <intersection.size(); i++){
+    for(int i = 0; i < (int)intersection.size(); i++){
         intersection_area += fabs(ClipperLib::Area(intersection.at(i)));
     }
 
@@ -127,13 +125,13 @@ ClipperLib::Path CompareToPolygon::rect2polygon(const int center_x, const int ce
 }
 void CompareToPolygon::init()
 {
-    Answer_shape_type = NULL;
-    Answer_center_point_x = Answer_center_point_y = NULL;
-    Answer_length_x       = Answer_length_y = NULL;
+    Answer_shape_type = 0;
+    Answer_center_point_x = Answer_center_point_y = 0;
+    Answer_length_x       = Answer_length_y = 0;
     Answer_polygon.clear();
 
-    Test_shape_type = NULL;
-    Test_center_point_x = Test_center_point_y = NULL;
-    Test_length_x       = Test_length_y = NULL;
+    Test_shape_type = 0;
+    Test_center_point_x = Test_center_point_y = 0;
+    Test_length_x       = Test_length_y = 0;
     Test_polygon.clear();
 }

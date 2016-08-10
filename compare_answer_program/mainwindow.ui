@@ -406,6 +406,46 @@
       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
      </property>
     </row>
+    <row>
+     <property name="text">
+      <string>Total object count</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Total true positive object</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Total false positive object</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Total true negative object</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Total false negative object</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+     </property>
+    </row>
     <column>
      <property name="text">
       <string>value</string>

@@ -7,6 +7,9 @@
 
 #include "clipper.hpp"
 
+#define PARTITION_ANGLE 1
+#define ZOOMIN          1000
+#define PI              3.141592
 
 
 class CompareToPolygon
@@ -24,9 +27,9 @@ private:
     ClipperLib::Path rect2polygon(const int center_x, const int center_y, int length_x, int length_y);
 
 private:
-    const int PARTITION_ANGLE = 1;
-    const int ZOOMIN = 1000;    
-    const double PI  = 3.141592;
+    //const int PARTITION_ANGLE = 1;
+    //const int ZOOMIN = 1000;
+    //const double PI  = 3.141592;
 
 private:
     enum shape_enum {dot_point, circle, rectangle};

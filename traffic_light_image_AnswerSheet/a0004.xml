@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Dot_point : 0 / Circle : 1 / Rectangle : 2 -->
+<Traffic_signal>
+	<image>
+		<filename>a0004.xml</filename>
+		<count>2</count>
+		<object>
+			<indexID>4</indexID>
+			<type_name>black</type_name>
+			<data>
+				<type_shape>2</type_shape>
+				<center_point_x>149</center_point_x>
+				<center_point_y>481</center_point_y>
+				<length_x>2296</length_x>
+				<length_y>988</length_y>
+			</data>
+		</object>
+		<object>
+			<indexID>4</indexID>
+			<type_name>red</type_name>
+			<data>
+				<type_shape>1</type_shape>
+				<center_point_x>506</center_point_x>
+				<center_point_y>976</center_point_y>
+				<length_x>465</length_x>
+				<length_y>465</length_y>
+			</data>
+		</object>
+	</image>
+</Traffic_signal>

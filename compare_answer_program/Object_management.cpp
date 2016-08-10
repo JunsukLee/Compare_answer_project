@@ -214,8 +214,8 @@ void Object_management::init(){
     this->foldername = "";
     this->filename = "";
 
-    this->count_id = NULL;
-    this->count = NULL;
+    this->count_id = 0;
+    this->count = 0;
     delete[] this->id;
     delete[] this->str_id;
     delete[] this->type_name;
@@ -271,8 +271,8 @@ std::vector<std::string> Object_management::split(const std::string &s, char del
 
 Object_management::~Object_management()
 {
-    this->count_id = NULL;
-    this->count = NULL;
+    this->count_id = 0;
+    this->count = 0;
     delete[] this->id;
     delete[] this->type_name;
     delete[] this->shape_config;
