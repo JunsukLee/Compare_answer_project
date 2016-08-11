@@ -64,6 +64,9 @@ bool Evaluation::targetFileOpen(QUrl answer_folder_url, QString answer_main_File
         test_check_mapping_table[i].selected_from_answer = false;
     }
 
+    this->answer_folder_url = answer_folder_url;
+    this->test_folder_url   = test_folder_url;
+
     return true;
 
 }
@@ -190,7 +193,12 @@ bool Evaluation::writeResultReport(int answer_file_totalCount, int current_filen
 
 
     QString str;
-    str = QString("Total target files\t\t:\t").append(QString::number(answer_file_totalCount)).append(QString("\n"));
+    str = QString("## OVERLAB RATE\t\t\t:\t").append(QString::number(_OVERLAP_RATE)).append(QString("% \n"));
+    str.append(QString("## Answer Folder URL\t\t:\t")).append(this->answer_folder_url.toString()).append(QString("\n"));
+    str.append(QString("## Test Folder URL\t\t:\t")).append(this->test_folder_url.toString()).append(QString("\n"));
+    str.append(QString("## Date\t\t\t\t:\t")).append(QDateTime::currentDateTimeUtc().toUTC().toString()).append(QString("\n\n"));
+    str.append(QString("==================================================================\n"));
+    str.append(QString("Total target files\t\t:\t")).append(QString::number(answer_file_totalCount)).append(QString("\n"));
     str.append(QString("Total successful files\t\t:\t").append(QString::number(current_filenNumber)).append(QString("\n")));
     str.append(QString("Total accuracy\t\t\t:\t").append(QString::number(Evaluation::getTotal_accuracy()*PERCENTILE)).append(QString("%\n")));
     str.append(QString("Total precision\t\t\t:\t").append(QString::number(Evaluation::getTotal_precision()*PERCENTILE)).append(QString("%\n")));

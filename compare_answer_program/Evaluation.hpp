@@ -61,10 +61,11 @@ private:
     int current_filenNumber;
 
     //Answer
+    QUrl              answer_folder_url;
     Object_management *answer_object_data;
 
     //Test
-    QUrl test_folder_url;
+    QUrl              test_folder_url;
     Object_management *test_object_data;    
 
 private:
