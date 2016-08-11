@@ -33,11 +33,12 @@ private slots:
     int scanFileList(QString strDir, QString filename);
     void on_btn_input_filename_answer_clicked();
     void on_btn_input_filename_test_clicked();
-    void on_btn_start_marking_exam_clicked();
+    void on_btn_start_marking_exam_clicked();    
 
 private:
     void    drawingTable();
-    QString makefilename(int num);    
+    QString makefilename(int num);
+    bool    check_overlap_rate();
 
 private:
     Ui::MainWindow *ui;

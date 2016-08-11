@@ -3,7 +3,10 @@
 
 #include <QUrl>
 #include <QString>
+#include <QFile>
+#include <QByteArray>
 #include <string>
+#include <map>
 
 #include "Object_management.h"
 #include "CompareToPolygon.hpp"
@@ -16,9 +19,10 @@ class Evaluation
 
 public:
     Evaluation();
-    ~Evaluation();
+    //~Evaluation();
     void init();    
-    bool start_Evaluation(QUrl answer_folder_url, QString answer_main_Filename, QUrl test_folder_url, QString test_main_Filename);
+    bool start_Evaluation(double _OVERLAP_RATE, QUrl answer_folder_url, QString answer_main_Filename, QUrl test_folder_url, QString test_main_Filename);
+    bool writeResultReport(int answer_file_totalCount, int current_filenNumber);
     double cal_Accuracy(int TP, int FP, int TN, int FN);
     double cal_Precision(int TP, int FP);
 
@@ -36,7 +40,7 @@ public: //get() set()
     int getTypename_count_maxsize();
 
 private:
-    enum Condition{Condition_TP, Condition_FP, Condition_TN, Condition_FN};
+    enum Condition{Condition_TP=0, Condition_FP=1, Condition_TN=2, Condition_FN=3};
     struct Test_check_mapping_table {
         char type_name[64];
         int  condition;
@@ -45,7 +49,7 @@ private:
 
 
 private:
-    void run_evaluation();
+    bool run_evaluation();
     bool targetFileOpen(QUrl answer_folder_url, QString answer_main_Filename, QUrl test_folder_url, QString test_main_Filename);
     int scanFileList(QString strDir, QString filename);
     void detect_typename(std::string *typename_evaluation_strName);
@@ -60,11 +64,12 @@ private:
     Object_management *answer_object_data;
 
     //Test
-    Object_management *test_object_data;
-
-    //const double PERCENTILE = 100.0;
+    QUrl test_folder_url;
+    Object_management *test_object_data;    
 
 private:
+    double _OVERLAP_RATE;
+
     int answer_shape_type;
     int answer_shape_centerX;
     int answer_shape_centerY;
@@ -89,7 +94,6 @@ private:
     int answer_index;
     int test_index;
 
-    //const int typename_evaluation_size = 10;
     std::string *typename_evaluation_strName;
     int **typename_evaluation_Score;
 

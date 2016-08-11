@@ -87,8 +87,8 @@ ClipperLib::Path CompareToPolygon::circle2polygon(const int center_x, const int 
     ClipperLib::Path circle_polygon;
 
     for(int radian=0; radian <= 360 ; radian += partition_angle ){
-        x_coordinate = (center_x + (r * cos(radian*(PI/180)))) * ZOOMIN;
-        y_coordinate = (center_y + (r * sin(radian*(PI/180)))) * ZOOMIN;
+        x_coordinate = center_x + ((r * cos(radian*(PI/180)))) * ZOOMIN;
+        y_coordinate = center_y + ((r * sin(radian*(PI/180)))) * ZOOMIN;
 
         circle_polygon.push_back(ClipperLib::IntPoint((int)x_coordinate, (int)y_coordinate));
     }
@@ -104,17 +104,17 @@ ClipperLib::Path CompareToPolygon::rect2polygon(const int center_x, const int ce
     int coordinate21[2];
     int coordinate22[2];
 
-    coordinate11[0] = (center_x - length_x/2) * ZOOMIN;
-    coordinate11[1] = (center_y + length_y/2) * ZOOMIN;
+    coordinate11[0] = center_x - (length_x/2) * ZOOMIN;
+    coordinate11[1] = center_y - (length_y/2) * ZOOMIN;
 
-    coordinate12[0] = (center_x + length_x/2) * ZOOMIN;
-    coordinate12[1] = (center_y + length_y/2) * ZOOMIN;
+    coordinate12[0] = center_x + (length_x/2) * ZOOMIN;
+    coordinate12[1] = center_y - (length_y/2) * ZOOMIN;
 
-    coordinate21[0] = (center_x - length_x/2) * ZOOMIN;
-    coordinate21[1] = (center_y - length_y/2) * ZOOMIN;
+    coordinate21[0] = center_x + (length_x/2) * ZOOMIN;
+    coordinate21[1] = center_y + (length_y/2) * ZOOMIN;
 
-    coordinate22[0] = (center_x - length_x/2) * ZOOMIN;
-    coordinate22[1] = (center_y - length_y/2) * ZOOMIN;
+    coordinate22[0] = center_x - (length_x/2) * ZOOMIN;
+    coordinate22[1] = center_y + (length_y/2) * ZOOMIN;
 
     rectangle_polygon.push_back(ClipperLib::IntPoint(coordinate11[0], coordinate11[1]));
     rectangle_polygon.push_back(ClipperLib::IntPoint(coordinate12[0], coordinate12[1]));

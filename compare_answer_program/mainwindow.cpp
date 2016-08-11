@@ -18,13 +18,19 @@ void MainWindow::init()
 {    
     answer_file_totalCount = 0;
     test_file_totalCount = 0;
-    current_filenNumber = 0;    
+    current_filenNumber = 0;
+
+    ui->lineEdit_answer_folderUrl->setReadOnly(true);
+    ui->lineEdit_test_folderUrl->setReadOnly(true);
+    ui->label_overlap->setAlignment(Qt::AlignCenter);
+    ui->lineEdit_overlapRate->setAlignment(Qt::AlignCenter);
 
     ui->progressBar->setValue(0);
     ui->progressBar->setStyleSheet(ui->progressBar->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: green; }");
     ui->progressBar->setTextVisible(true);
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);    
     ui->tableWidget->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 void MainWindow::on_Btn_answer_folderUrl_clicked()
@@ -56,32 +62,50 @@ int MainWindow::scanFileList(QString strDir, QString filename)
 }
 
 void MainWindow::on_btn_input_filename_answer_clicked()
-{
+{    
     answer_main_Filename = ui->ansersheet_filename_lineEdit->text();
 
-    // load filelist nubmer
-    answer_file_totalCount = scanFileList(answer_folder_url.toString(), answer_main_Filename);
-    ui->ansersheet_filenumber_textlabel->setText(QString::number(answer_file_totalCount));
+    if(answer_main_Filename.operator ==((""))){
+        QMessageBox::information(this,"Error","Please Input Main Filename.");
+    }else{
+        if(ui->lineEdit_answer_folderUrl->text().operator ==(("")))
+            QMessageBox::information(this,"Error","Please Input Answer FolderURL.");
+        else{
+            // load filelist nubmer
+            answer_file_totalCount = scanFileList(answer_folder_url.toString(), answer_main_Filename);
+            ui->ansersheet_filenumber_textlabel->setText(QString::number(answer_file_totalCount));
+        }
+    }
 
 }
+
 
 
 void MainWindow::on_btn_input_filename_test_clicked()
 {
-    test_main_Filename = ui->ansersheet_filename_lineEdit->text();
+    test_main_Filename = ui->testsheet_filename_lineEdit->text();
 
-    // load filelist nubmer
-    test_file_totalCount = scanFileList(test_folder_url.toString(), test_main_Filename);
-    ui->testrsheet_filenumber_textlabel->setText(QString::number(test_file_totalCount));
+    if(test_main_Filename.operator ==((""))){
+        QMessageBox::information(this,"Error","Please Input Main Filename.");
+    }else{
+        if(ui->lineEdit_test_folderUrl->text().operator ==(("")))
+            QMessageBox::information(this,"Error","Please Input Test FolderURL.");
+        else{
+            // load filelist nubmer
+            test_file_totalCount = scanFileList(test_folder_url.toString(), test_main_Filename);
+            ui->testrsheet_filenumber_textlabel->setText(QString::number(test_file_totalCount));
+        }
+    }
 }
 
+// -----------------------------------------------------------------------------------------------
 void MainWindow::on_btn_start_marking_exam_clicked()
 {    
     if(answer_file_totalCount == 0){
         QMessageBox::information(this,"Error","Please Input Answer Sheet.");
     }else if(test_file_totalCount == 0){
         QMessageBox::information(this,"Error","Please Input Test Sheet.");
-    }else {
+    }else if(check_overlap_rate()){
         current_filenNumber=1;
         evaluation = new Evaluation();
         evaluation->init();
@@ -90,14 +114,17 @@ void MainWindow::on_btn_start_marking_exam_clicked()
             QString answer_filename_param = answer_main_Filename + (makefilename(current_filenNumber)) + QString(".xml");
             QString test_filename_param   = test_main_Filename + (makefilename(current_filenNumber)) + QString(".xml");
 
-            evaluation->start_Evaluation(answer_folder_url, answer_filename_param, test_folder_url, test_filename_param);
+            evaluation->start_Evaluation(ui->lineEdit_overlapRate->text().toDouble(), answer_folder_url, answer_filename_param, test_folder_url, test_filename_param);
             current_filenNumber++;
             ui->progressBar->setValue((current_filenNumber / answer_file_totalCount)*100);
         }
         current_filenNumber--;
         drawingTable();
+        if(!evaluation->writeResultReport(answer_file_totalCount, current_filenNumber))
+            QMessageBox::information(this,"Error","Fail to save the Result Report.");
     }
 }
+// -----------------------------------------------------------------------------------------------
 
 QString MainWindow::makefilename(int num){
     int n1 = num / 1000; num -= (n1*1000);
@@ -109,9 +136,26 @@ QString MainWindow::makefilename(int num){
 
     return result;
 }
-void MainWindow::drawingTable()
+
+bool MainWindow::check_overlap_rate()
 {
-    int total_rowCount=0;
+    double overlap_rate = ui->lineEdit_overlapRate->text().toDouble();
+    if(overlap_rate > 0.0 && overlap_rate <= 1.0){
+        return true;
+    }else{
+        QMessageBox::information(this,"Error::Setting OVERLAP_RATE","TRUE CONDITION : 0 < OVERLAP_RATE <= 1");
+        return false;
+    }
+
+}
+
+void MainWindow::drawingTable()
+{    
+    int row_index=10;
+    ui->tableWidget->clearContents();
+    while(ui->tableWidget->rowCount() != 10){
+        ui->tableWidget->removeRow(row_index);
+    }
 
     ui->tableWidget->setItem(0, 0, new QTableWidgetItem(QString::number(answer_file_totalCount)));
     ui->tableWidget->setItem(1, 0, new QTableWidgetItem(QString::number(current_filenNumber)));
@@ -142,8 +186,7 @@ void MainWindow::drawingTable()
 
 
 
-    total_rowCount = 10;
-
+    int total_rowCount = 10;
     ui->tableWidget->insertRow(total_rowCount);
     ui->tableWidget->setVerticalHeaderItem(total_rowCount, new QTableWidgetItem(""));
 
@@ -155,8 +198,8 @@ void MainWindow::drawingTable()
         }
         int TP = evaluation->getTypename_evaluation_Score()[addrow][0];
         int FP = evaluation->getTypename_evaluation_Score()[addrow][1];
-        int TN = 0;
-        int FN = evaluation->getTypename_evaluation_Score()[addrow][2];
+        int TN = evaluation->getTypename_evaluation_Score()[addrow][2];
+        int FN = evaluation->getTypename_evaluation_Score()[addrow][3];
 
         double accuracy  = evaluation->cal_Accuracy(TP, FP, TN, FN);
         double precision = evaluation->cal_Precision(TP, FP);

@@ -8,7 +8,7 @@
 #include "clipper.hpp"
 
 #define PARTITION_ANGLE 1
-#define ZOOMIN          1000
+#define ZOOMIN          1
 #define PI              3.141592
 
 
