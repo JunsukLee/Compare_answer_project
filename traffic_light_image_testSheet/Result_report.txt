@@ -1,0 +1,28 @@
+Total target files		:	5
+Total successful files		:	5
+Total accuracy			:	72.7273%
+Total precision			:	80%
+Total false_discovery_rate(FDR)	:	0
+Total object count		:	11
+Total true positive object	:	8
+Total false positive object	:	2
+Total true negative object	:	0
+Total false negative object	:	1
+
+
+==================================================================
+red accuracy			:	83.3333%
+red precision			:	83.3333%
+red true positive object	:	5
+red false positive object	:	1
+red true negative object	:	0
+red false negative object	:	0
+
+
+==================================================================
+black accuracy			:	60%
+black precision			:	75%
+black true positive object	:	3
+black false positive object	:	1
+black true negative object	:	0
+black false negative object	:	1
